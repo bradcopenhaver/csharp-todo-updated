@@ -4,6 +4,80 @@ using System;
 
 namespace ToDoList
 {
+  public class Category
+  {
+    private int _id;
+    private string _name;
+
+    public Category(string name, int id = 0)
+    {
+      _name = name;
+    }
+
+    public override bool Equals(Object otherCategory)
+    {
+      if (!(otherCategory is Category))
+      {
+        return false;
+      }
+      else
+      {
+        Category newCategory = (Category) otherCategory;
+        bool idEquality = (this._id == newCategory.GetId());
+        bool nameEquality = (this._name == newCategory.GetName());
+        return (idEquality && nameEquality);
+      }
+    }
+
+    public static List<Category> GetAll()
+    {
+      List<Category> allCategories = new List<Category>{};
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+      SqlCommand cmd = new SqlCommand("SELECT * FROM categories;", conn);
+      SqlDataReader rdr = cmd.ExecuteReader();
+      while (rdr.Read())
+      {
+        int categoryId = rdr.GetInt32(0);
+        string categoryName = rdr.GetString(1);
+        Category newCategory = new Category(categoryName, categoryId);
+        allCategories.Add(newCategory);
+      }
+
+      if (rdr != null)
+      {
+        rdr.Close();
+      }
+      if (conn != null)
+      {
+        conn.Close();
+      }
+
+      return allCategories;
+    }
+
+    public string GetName()
+    {
+      return _name;
+    }
+
+    public int GetId()
+    {
+      return _id;
+    }
+
+    public static void DeleteAll()
+    {
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+      SqlCommand cmd = new SqlCommand("DELETE FROM categories", conn);
+      cmd.ExecuteNonQuery();
+      conn.Close();
+    }
+  }
+
+  //
+
   public class Task
   {
     private int _id;

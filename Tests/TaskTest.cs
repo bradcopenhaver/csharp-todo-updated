@@ -6,6 +6,29 @@ using System.Data.SqlClient;
 
 namespace ToDoList
 {
+  public class CategoryTest : IDisposable
+  {
+    public CategoryTest()
+    {
+      DBConfiguration.ConnectionString = "Data Source=(localdb)\\mssqllocaldb;Initial Catalog=todo_test;Integrated Security=SSPI;";
+    }
+
+    [Fact]
+    public void Test_CategoriesEmptyAtFirst()
+    {
+      //Arrange, Act
+      int result = Category.GetAll().Count;
+
+      //Assert
+      Assert.Equal(0, result);
+    }
+
+    public void Dispose()
+    {
+      Category.DeleteAll();
+    }
+  }
+
   public class ToDoTest : IDisposable
   {
     public ToDoTest()
