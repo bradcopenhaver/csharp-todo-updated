@@ -45,6 +45,7 @@ namespace ToDoList.Objects
       //Assert
       Assert.Equal(testList, result);
     }
+
     [Fact]
     public void Test_Save_AssignsIdToObject()
     {
@@ -73,6 +74,23 @@ namespace ToDoList.Objects
 
       //Assert
       Assert.Equal(testTask, foundTask);
+    }
+
+    [Fact]
+    public void Test_Find_OrderByDueDate()
+    {
+      //Arrange
+      Task firstTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
+      Task secondTask = new Task("Do the dishes", 1, new DateTime(2016, 12, 1));
+
+      //Act
+      secondTask.Save();
+      firstTask.Save();
+      List<Task> result = Task.GetAll();
+      List<Task> testList = new List<Task>{firstTask, secondTask};
+
+      //Assert
+      Assert.Equal(testList, result);
     }
 
     public void Dispose()
