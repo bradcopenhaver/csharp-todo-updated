@@ -4,7 +4,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace ToDoList
+namespace ToDoList.Objects
 {
   public class ToDoTest : IDisposable
   {
@@ -24,8 +24,8 @@ namespace ToDoList
     public void Test_Equal_ReturnsTrueIfDescriptionsAreTheSame()
     {
       //Arrange, Act
-      Task firstTask = new Task("Mow the lawn", 1);
-      Task secondTask = new Task("Mow the lawn", 1);
+      Task firstTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
+      Task secondTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
 
       //Assert
       Assert.Equal(firstTask, secondTask);
@@ -35,7 +35,7 @@ namespace ToDoList
     public void Test_Save_SavesToDatabase()
     {
       //Arrange
-      Task testTask = new Task("Mow the lawn", 1);
+      Task testTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
 
       //Act
       testTask.Save();
@@ -49,7 +49,7 @@ namespace ToDoList
     public void Test_Save_AssignsIdToObject()
     {
       //Arrange
-      Task testTask = new Task("Mow the lawn", 1);
+      Task testTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
       //Act
       testTask.Save();
       Task savedTask = Task.GetAll()[0];
@@ -65,7 +65,7 @@ namespace ToDoList
     public void Test_Find_FindsTaskInDatabase()
     {
       //Arrange
-      Task testTask = new Task("Mow the lawn", 1);
+      Task testTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
       testTask.Save();
 
       //Act

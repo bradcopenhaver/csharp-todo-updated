@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System;
+using System.Data;
 
-namespace ToDoList
+namespace ToDoList.Objects
 {
   public class Category
   {
@@ -45,7 +46,6 @@ namespace ToDoList
       while (rdr.Read())
       {
         int categoryId = rdr.GetInt32(0);
-        // System.Console.WriteLine("Category Id: " + categoryId);
         string categoryName = rdr.GetString(1);
         Category newCategory = new Category(categoryName, categoryId);
         allCategories.Add(newCategory);
@@ -147,7 +147,8 @@ namespace ToDoList
         int taskId = rdr.GetInt32(0);
         string taskDescription = rdr.GetString(1);
         int taskCategoryId = rdr.GetInt32(2);
-        Task newTask = new Task(taskDescription, taskCategoryId, taskId);
+        DateTime taskDueDate = rdr.GetDateTime(3);
+        Task newTask = new Task(taskDescription, taskCategoryId, taskDueDate, taskId);
         tasks.Add(newTask);
       }
       if (rdr != null)
