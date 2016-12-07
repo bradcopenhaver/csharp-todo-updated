@@ -174,6 +174,20 @@ namespace ToDoList.Objects
 			return foundTask;
 		}
 
+    public static void DeleteTask(int id)
+		{
+			SqlConnection conn = DB.Connection();
+			conn.Open();
+
+			SqlCommand cmd = new SqlCommand("DELETE FROM tasks WHERE id = @TaskId;", conn);
+			SqlParameter taskIdParameter = new SqlParameter();
+			taskIdParameter.ParameterName = "@TaskId";
+			taskIdParameter.Value = id.ToString();
+			cmd.Parameters.Add(taskIdParameter);
+			SqlDataReader rdr = cmd.ExecuteReader();
+			conn.Close();
+		}
+
 		public static void DeleteAll()
 		{
 		  SqlConnection conn = DB.Connection();

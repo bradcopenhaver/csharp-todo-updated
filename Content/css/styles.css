@@ -1,0 +1,33 @@
+a {
+  color: blue;
+  text-decoration: none;
+}
+
+a:hover {
+  color: green;
+  text-decoration: none;
+}
+
+ul, ol {
+  padding: 0px;
+}
+
+.dark {
+  background-color: #AAA;
+  min-height: 24px;
+  vertical-align: middle;
+}
+
+.light {
+  background-color: #EEE;
+  min-height: 24px;
+  vertical-align: middle;
+}
+
+li {
+  list-style-type: none;
+}
+
+li:hover {
+  background-color: #CCC;
+}

@@ -35,6 +35,11 @@ namespace ToDoList
         List<Task> allTasks = Task.GetAll();
 				return View["task.cshtml", allTasks];
 			};
+			Get["/tasks/delete/{id}"] = parameters =>
+			{
+				Task.DeleteTask(parameters.id);
+				return View["cleared.cshtml"];
+			};
       Get["/tasks/new"] = _ => {
       List<Category> AllCategories = Category.GetAll();
       return View["tasks_form.cshtml", AllCategories];

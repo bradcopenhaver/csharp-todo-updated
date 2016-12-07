@@ -1,3 +1,10 @@
+@{
+  Layout="Shared/_Layout.cshtml";
+}
+
 <h1>To Do List</h1>
-<h4><a href="/categories">View Categories</a></h4>
-<h4><a href="/tasks">View Tasks</a></h4>
+<h4><a class="btn btn-primary btn-hippie" href="/categories">View Categories</a></h4>
+@if(Model.Count != 0)
+{
+<h4><a class="btn btn-primary" href="/tasks">View Tasks</a></h4>
+}

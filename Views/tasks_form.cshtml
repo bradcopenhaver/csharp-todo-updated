@@ -1,3 +1,7 @@
+@{
+  Layout="Shared/_Layout.cshtml";
+}
+
 <h1>Add a new task</h1>
 <form action="/tasks/new" method="post">
   <label for="task-description">Task description:</label>
@@ -14,7 +18,7 @@
       <option value="@category.GetId()">@category.GetName()</option>
     }
   </select>
-  <button type="submit">Add new task</button>
+  <button class="btn btn-success" type="submit">Add new task</button>
 </form>
-<p><a href="/">Back home</a></p>
-<p><a href="/tasks">View all tasks</a></p>
+<p><a class="btn btn-default" href="/">Back home</a></p>
+<p><a class="btn btn-primary" href="/tasks">View all tasks</a></p>

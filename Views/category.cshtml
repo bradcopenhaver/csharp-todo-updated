@@ -1,3 +1,7 @@
+@{
+  Layout="Shared/_Layout.cshtml";
+}
+
 <h2>Here are all the tasks in this category:</h2>
 
 @if (@Model["tasks"].Count == 0)
@@ -6,12 +10,36 @@
 }
 else
 {
+  int count = 0;
+  string rowHighlight = "row";
   <ol>
     @foreach (var task in @Model["tasks"])
     {
-      <li>@task.GetDescription()</li>
+      if (count % 2 == 0)
+      {
+        rowHighlight = rowHighlight + " dark";
+        count++;
+      }
+      else
+      {
+        rowHighlight = rowHighlight + " light";
+        count++;
+      }
+      <div class="@rowHighlight">
+        <li>
+          <div class="col-md-4">
+            @task.GetDescription()&nbsp;
+          </div>
+          <div class="col-md-4">
+            @task.GetDueDate().Date.ToString("MM/dd/yyyy")
+          </div>
+          <div class="col-md-4">
+            <a class="btn btn-danger" href="/tasks/delete/@task.GetId()">X</a>
+          </div>
+        </li>
+      </div>
     }
   </ol>
 }
-<p><a href="/tasks/new">Add a new task</a></p>
-<p><a href="/">Return to Main Page</a></p>
+<p><a class="btn btn-primary" href="/tasks/new">Add a new task</a></p>
+<p><a class="btn btn-default" href="/">Return to Main Page</a></p>
