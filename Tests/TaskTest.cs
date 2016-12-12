@@ -16,6 +16,7 @@ namespace ToDoList.Objects
     [Fact]
     public void Test_DatabaseEmptyAtFirst()
     {
+      Task.DeleteAll();
       int result = Task.GetAll().Count;
       Assert.Equal(0,result);
     }
@@ -23,9 +24,10 @@ namespace ToDoList.Objects
     [Fact]
     public void Test_Equal_ReturnsTrueIfDescriptionsAreTheSame()
     {
+      Task.DeleteAll();
       //Arrange, Act
-      Task firstTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
-      Task secondTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
+      Task firstTask = new Task("Mow the lawn");
+      Task secondTask = new Task("Mow the lawn");
 
       //Assert
       Assert.Equal(firstTask, secondTask);
@@ -34,8 +36,9 @@ namespace ToDoList.Objects
     [Fact]
     public void Test_Save_SavesToDatabase()
     {
+      Task.DeleteAll();
       //Arrange
-      Task testTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
+      Task testTask = new Task("Mow the lawn");
 
       //Act
       testTask.Save();
@@ -49,8 +52,9 @@ namespace ToDoList.Objects
     [Fact]
     public void Test_Save_AssignsIdToObject()
     {
+      Task.DeleteAll();
       //Arrange
-      Task testTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
+      Task testTask = new Task("Mow the lawn");
       //Act
       testTask.Save();
       Task savedTask = Task.GetAll()[0];
@@ -65,8 +69,9 @@ namespace ToDoList.Objects
     [Fact]
     public void Test_Find_FindsTaskInDatabase()
     {
+      Task.DeleteAll();
       //Arrange
-      Task testTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
+      Task testTask = new Task("Mow the lawn");
       testTask.Save();
 
       //Act
@@ -77,17 +82,44 @@ namespace ToDoList.Objects
     }
 
     [Fact]
-    public void Test_Find_OrderByDueDate()
+    public void Test_AddCategory_AddsCategoryToTask()
     {
+      Task.DeleteAll();
       //Arrange
-      Task firstTask = new Task("Mow the lawn", 1, new DateTime(2016, 11, 30));
-      Task secondTask = new Task("Do the dishes", 1, new DateTime(2016, 12, 1));
+      Task testTask = new Task("Mow the lawn");
+      testTask.Save();
+
+      Category testCategory = new Category("Home stuff");
+      testCategory.Save();
 
       //Act
-      secondTask.Save();
-      firstTask.Save();
-      List<Task> result = Task.GetAll();
-      List<Task> testList = new List<Task>{firstTask, secondTask};
+      testTask.AddCategory(testCategory);
+
+      List<Category> result = testTask.GetCategories();
+      List<Category> testList = new List<Category>{testCategory};
+
+      //Assert
+      Assert.Equal(testList, result);
+    }
+
+    [Fact]
+    public void Test_GetCategories_ReturnsAllTaskCategories()
+    {
+      Task.DeleteAll();
+      //Arrange
+      Task testTask = new Task("Mow the lawn");
+      testTask.Save();
+
+      Category testCategory1 = new Category("Home stuff");
+      testCategory1.Save();
+
+      Category testCategory2 = new Category("Work stuff");
+      testCategory2.Save();
+
+      //Act
+      testTask.AddCategory(testCategory1);
+      List<Category> result = testTask.GetCategories();
+      List<Category> testList = new List<Category> {testCategory1};
 
       //Assert
       Assert.Equal(testList, result);
