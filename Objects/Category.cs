@@ -175,16 +175,16 @@ namespace ToDoList.Objects
       List<Task> tasks = new List<Task> {};
       foreach (int taskId in taskIds)
       {
-        SqlCommand taskQuery = new SqlCommand("SELECT * FROM tasks WHERE id = @TaskId;", conn);
+        SqlCommand taskQuery = new SqlCommand("SELECT description, completed, due_date FROM tasks WHERE id = @TaskId;", conn);
         taskQuery.Parameters.AddWithValue("@TaskId", taskId);
 
         SqlDataReader queryReader = taskQuery.ExecuteReader();
         while(queryReader.Read())
         {
-          int thisTaskId = queryReader.GetInt32(0);
-          string taskDescription = queryReader.GetString(1);
-          bool thisTaskCompleted = queryReader.GetBoolean(2);
-          Task foundTask = new Task(taskDescription, thisTaskCompleted, thisTaskId);
+          string taskDescription = queryReader.GetString(0);
+          bool taskCompleted = queryReader.GetBoolean(1);
+          DateTime taskDueDate = queryReader.GetDateTime(2);
+          Task foundTask = new Task(taskDescription, taskCompleted, taskDueDate, taskId);
           tasks.Add(foundTask);
         }
         if (queryReader != null) {queryReader.Close();}

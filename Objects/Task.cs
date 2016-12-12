@@ -10,12 +10,29 @@ namespace ToDoList.Objects
     private int _id;
     private string _description;
     private bool _completed;
+    private DateTime _dueDate;
 
-    public Task(string Description, bool completed = false, int Id = 0)
+    public Task(string Description, DateTime dueDate, bool completed = false, int Id = 0)
     {
       _id = Id;
       _description = Description;
       _completed = completed;
+      _dueDate = dueDate;
+    }
+
+    public Task(string Description, bool completed = false, DateTime? dueDate = null, int Id = 0)
+    {
+      _id = Id;
+      _description = Description;
+      _completed = completed;
+      if (dueDate == null)
+      {
+        _dueDate = (DateTime) DateTime.Today;
+      }
+      else
+      {
+        _dueDate = (DateTime) dueDate;
+      }
     }
 
 		public override bool Equals(Object otherTask)
@@ -30,7 +47,8 @@ namespace ToDoList.Objects
 				bool idEquality = (this.GetId() == newTask.GetId());
 				bool descriptionEquality = (this.GetDescription() == newTask.GetDescription());
         bool completedEquality = (this.GetCompleted() == newTask.GetCompleted());
-				return (idEquality && descriptionEquality && completedEquality);
+        bool dueDateEquality = (_dueDate == newTask.GetDueDate());
+				return (idEquality && descriptionEquality && completedEquality && dueDateEquality);
 			}
 		}
     public override int GetHashCode()
@@ -112,6 +130,10 @@ namespace ToDoList.Objects
     {
       _description = newDescription;
     }
+    public DateTime GetDueDate()
+    {
+      return _dueDate;
+    }
 
     public void ToggleCompleted()
     {
@@ -151,26 +173,21 @@ namespace ToDoList.Objects
       SqlConnection conn = DB.Connection();
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks;", conn);
+      SqlCommand cmd = new SqlCommand("SELECT * FROM tasks ORDER BY due_date;", conn);
       SqlDataReader rdr = cmd.ExecuteReader();
 
       while(rdr.Read())
       {
         int taskId = rdr.GetInt32(0);
         string taskDescription = rdr.GetString(1);
-        bool completed = rdr.GetBoolean(2);
-        Task newTask = new Task(taskDescription, completed, taskId);
+        bool taskCompleted = rdr.GetBoolean(2);
+        DateTime taskDueDate = rdr.GetDateTime(3);
+        Task newTask = new Task(taskDescription, taskCompleted, taskDueDate, taskId);
         allTasks.Add(newTask);
       }
 
-      if (rdr != null)
-      {
-        rdr.Close();
-      }
-      if (conn != null)
-      {
-        conn.Close();
-      }
+      if (rdr != null) rdr.Close();
+      if (conn != null) conn.Close();
 
       return allTasks;
     }
@@ -178,16 +195,15 @@ namespace ToDoList.Objects
 		{
 			SqlConnection conn = DB.Connection();
 			conn.Open();
-			SqlCommand cmd = new SqlCommand("INSERT INTO tasks (description, completed) OUTPUT INSERTED.id VALUES (@TaskDescription, @Completed);", conn);
+			SqlCommand cmd = new SqlCommand("INSERT INTO tasks (description, completed, due_date) OUTPUT INSERTED.id VALUES (@TaskDescription, @Completed, @DueDate);", conn);
 
 			cmd.Parameters.AddWithValue("@TaskDescription", _description);
       cmd.Parameters.AddWithValue("@Completed", _completed);
+      cmd.Parameters.AddWithValue("@DueDate", _dueDate);
 			SqlDataReader rdr = cmd.ExecuteReader();
 
-			while(rdr.Read())
-			{
-				this._id = rdr.GetInt32(0);
-			}
+			while(rdr.Read()) this._id = rdr.GetInt32(0);
+
 			if (rdr != null) {rdr.Close();}
 			if (conn != null) {conn.Close();}
 		}
@@ -197,7 +213,7 @@ namespace ToDoList.Objects
 			SqlConnection conn = DB.Connection();
 			conn.Open();
 
-			SqlCommand cmd = new SqlCommand("SELECT * FROM tasks WHERE id = @TaskId;", conn);
+			SqlCommand cmd = new SqlCommand("SELECT description, completed, due_date FROM tasks WHERE id = @TaskId;", conn);
 			SqlParameter taskIdParameter = new SqlParameter();
 			taskIdParameter.ParameterName = "@TaskId";
 			taskIdParameter.Value = id.ToString();
@@ -207,22 +223,17 @@ namespace ToDoList.Objects
 			int foundTaskId = 0;
 			string foundTaskDescription = null;
       bool foundTaskCompleted = false;
+      DateTime foundTaskDueDate = DateTime.Today;
 			while(rdr.Read())
 			{
-				foundTaskId = rdr.GetInt32(0);
-				foundTaskDescription = rdr.GetString(1);
-        foundTaskCompleted = rdr.GetBoolean(2);
+				foundTaskDescription = rdr.GetString(0);
+        foundTaskCompleted = rdr.GetBoolean(1);
+        foundTaskDueDate = rdr.GetDateTime(2);
 			}
-			Task foundTask = new Task(foundTaskDescription, foundTaskCompleted, foundTaskId);
+			Task foundTask = new Task(foundTaskDescription, foundTaskCompleted, foundTaskDueDate, id);
 
-			if (rdr != null)
-			{
-				rdr.Close();
-			}
-			if (conn != null)
-			{
-				conn.Close();
-			}
+			if (rdr != null) rdr.Close();
+			if (conn != null) conn.Close();
 
 			return foundTask;
 		}

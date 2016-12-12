@@ -145,6 +145,7 @@ namespace ToDoList.Objects
       //Assert
       Assert.Equal(testCategoryTasks, resultCategoryTasks);
     }
+
     [Fact]
     public void ToggleCompleted_ChangeTaskCompletedStatus_true()
     {
@@ -159,6 +160,25 @@ namespace ToDoList.Objects
 
       //Assert
       Assert.Equal(foundTask, newTask);
+    }
+
+    [Fact]
+    public void SortByDueDate_ListSortedInChronologicalOrder()
+    {
+      //Arrange
+      DateTime firstDate = new DateTime(2016, 12, 1);
+      DateTime secondDate = new DateTime(2016, 11, 1);
+      Task task1 = new Task("first thing", firstDate);
+      Task task2 = new Task("second thing", secondDate);
+      task1.Save();
+      task2.Save();
+
+      //Act
+      List<Task> allTasks = Task.GetAll();
+      List<Task> taskList = new List<Task> {task2, task1};
+
+      //Assert
+      Assert.Equal(taskList, allTasks);
     }
 
     public void Dispose()
