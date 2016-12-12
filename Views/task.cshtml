@@ -2,7 +2,26 @@
   Layout="Shared/_Layout.cshtml";
 }
 
-<h2>Here are all the categories for this task:</h2>
+<h2>@Model["task"].GetDescription()</h2>
+@if (@Model["task"].GetCompleted())
+{
+  <h4>This task has been completed. Good job!</h4>
+  <form action='/tasks/@Model["task"].GetId()' method="post">
+    <input type="hidden" name="_method" value="PATCH">
+    <button class="btn btn-primary" type="submit">Mark as incomplete</button>
+  </form>
+}
+else
+{
+  <h4>This task is due @Model["task"].GetDueDate().Date.</h4>
+  <form action='/tasks/@Model["task"].GetId()' method="post">
+    <input type="hidden" name="_method" value="PATCH">
+    <button class="btn btn-primary" type="submit">Mark as complete</button>
+  </form>
+}
+
+
+<h3>Here are all the categories for this task:</h3>
 
 @if (@Model["categories"].Count == 0)
 {
@@ -10,22 +29,10 @@
 }
 else
 {
-  int count = 0;
-  string rowHighlight = "row";
   <ol>
     @foreach (var category in @Model["categories"])
     {
-      if (count % 2 == 0)
-      {
-        rowHighlight = rowHighlight + " dark";
-        count++;
-      }
-      else
-      {
-        rowHighlight = rowHighlight + " light";
-        count++;
-      }
-      <div class="@rowHighlight">
+      <div class="row">
         <li>
           <div class="col-md-4">
             @category.GetName()&nbsp;

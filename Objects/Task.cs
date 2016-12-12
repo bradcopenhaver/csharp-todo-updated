@@ -151,7 +151,7 @@ namespace ToDoList.Objects
       }
       if (rdr != null) rdr.Close();
       if (completed) {
-        SqlCommand setCompletedCmd = new SqlCommand("UPDATE tasks SET completed = FALSE WHERE id = @id;", conn);
+        SqlCommand setCompletedCmd = new SqlCommand("UPDATE tasks SET completed = 'FALSE' WHERE id = @id;", conn);
         setCompletedCmd.Parameters.AddWithValue("@id", _id);
         setCompletedCmd.ExecuteNonQuery();
         _completed = false;

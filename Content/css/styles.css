@@ -12,16 +12,9 @@ ul, ol {
   padding: 0px;
 }
 
-.dark {
-  background-color: #AAA;
-  min-height: 24px;
-  vertical-align: middle;
-}
-
-.light {
-  background-color: #EEE;
-  min-height: 24px;
-  vertical-align: middle;
+.completed {
+  text-decoration: line-through;
+  color: lightgray;
 }
 
 li {

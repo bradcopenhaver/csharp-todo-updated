@@ -5,7 +5,11 @@
 <h1>Add a new task</h1>
 <form action="/tasks/new" method="post">
   <label for="task-description">Task description:</label>
-  <input id="task-description" name="task-description" type="text">  
+  <input id="task-description" name="task-description" type="text" required>
+  <label>Due Date:</label>
+  <input name="dueMonth" type="number" placeholder="MM" min="1" max="12" required>/
+  <input type="number" name="dueDay" placeholder="DD" min="1" max="31" required>/
+  <input type="number" name="dueYear" value="2016" min="2016" max="5555" required>
   <select name="category-id">
     @foreach (var category in Model)
     {

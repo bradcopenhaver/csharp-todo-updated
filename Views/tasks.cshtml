@@ -8,28 +8,26 @@
 }
 else
 {
-  int count = 0;
-  string rowHighlight = "row";
   <h1>Here is your list of tasks:</h1>
   <ul>
     @foreach (var task in Model)
     {
-      if (count % 2 == 0)
+      string completedClass = "col-md-3";
+      if (task.GetCompleted())
       {
-        count++;
-        rowHighlight = rowHighlight + " dark";
+        completedClass += " completed";
       }
-      else
-      {
-        count++;
-        rowHighlight = rowHighlight + " light";
-      }
-      <div class="@rowHighlight">
+      <div class="row">
         <li>
-          <div class="col-md-4">
+          <div class="@completedClass">
             <a href="/tasks/@task.GetId()">@task.GetDescription()</a>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
+            <p>@task.GetDueDate()</p>
+          </div>
+          <div class="col-md-3">
+          </div>
+          <div class="col-md-3">
             <a class="btn btn-danger" href="/tasks/delete/@task.GetId()">X</a>
           </div>
         </li>

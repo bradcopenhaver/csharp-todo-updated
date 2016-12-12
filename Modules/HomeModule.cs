@@ -45,7 +45,11 @@ namespace ToDoList
 	      return View["tasks_form.cshtml", AllCategories];
       };
       Post["/tasks/new"] = _ => {
-        Task newTask = new Task(Request.Form["task-description"]);
+				int year = int.Parse(Request.Form["dueYear"]);
+				int month = int.Parse(Request.Form["dueMonth"]);
+				int day = int.Parse(Request.Form["dueDay"]);
+				DateTime dueDate = new DateTime(year, month, day);
+        Task newTask = new Task(Request.Form["task-description"], dueDate);
         newTask.Save();
 				newTask.AddCategory(Category.Find(Request.Form["category-id"]));
         return View["success.cshtml"];
@@ -88,6 +92,17 @@ namespace ToDoList
 			  Task task = Task.Find(Request.Form["task-id"]);
 			  category.AddTask(task);
 			  return View["success.cshtml"];
+			};
+			Patch["/tasks/{id}"] = parameters => {
+				Task currentTask = Task.Find(parameters.id);
+				currentTask.ToggleCompleted();
+				Dictionary<string, object> model = new Dictionary<string, object>();
+        List<Category> TaskCategories = currentTask.GetCategories();
+				List<Category> AllCategories = Category.GetAll();
+        model.Add("task", currentTask);
+        model.Add("categories", TaskCategories);
+				model.Add("allCategories", AllCategories);
+        return View["task.cshtml", model];
 			};
 		}
 	}
