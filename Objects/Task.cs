@@ -9,11 +9,13 @@ namespace ToDoList.Objects
   {
     private int _id;
     private string _description;
+    private bool _completed;
 
-    public Task(string Description, int Id = 0)
+    public Task(string Description, bool completed = false, int Id = 0)
     {
       _id = Id;
       _description = Description;
+      _completed = completed;
     }
 
 		public override bool Equals(Object otherTask)
@@ -27,7 +29,8 @@ namespace ToDoList.Objects
 				Task newTask = (Task) otherTask;
 				bool idEquality = (this.GetId() == newTask.GetId());
 				bool descriptionEquality = (this.GetDescription() == newTask.GetDescription());
-				return (idEquality && descriptionEquality);
+        bool completedEquality = (this.GetCompleted() == newTask.GetCompleted());
+				return (idEquality && descriptionEquality && completedEquality);
 			}
 		}
     public override int GetHashCode()
@@ -93,6 +96,14 @@ namespace ToDoList.Objects
     {
       return _id;
     }
+    public bool GetCompleted()
+    {
+      return _completed;
+    }
+    public void ChangeCompleted()
+    {
+      _completed = _completed ? false : true;
+    }
     public string GetDescription()
     {
       return _description;
@@ -101,6 +112,38 @@ namespace ToDoList.Objects
     {
       _description = newDescription;
     }
+
+    public void ToggleCompleted()
+    {
+      SqlConnection conn = DB.Connection();
+      conn.Open();
+
+      SqlCommand cmd = new SqlCommand("SELECT completed FROM tasks WHERE id = @id;", conn);
+      cmd.Parameters.AddWithValue("@id", _id);
+      SqlDataReader rdr = cmd.ExecuteReader();
+
+      bool completed = false;
+      while(rdr.Read())
+      {
+        completed = rdr.GetBoolean(0);
+      }
+      if (rdr != null) rdr.Close();
+      if (completed) {
+        SqlCommand setCompletedCmd = new SqlCommand("UPDATE tasks SET completed = FALSE WHERE id = @id;", conn);
+        setCompletedCmd.Parameters.AddWithValue("@id", _id);
+        setCompletedCmd.ExecuteNonQuery();
+        _completed = false;
+      }
+      else
+      {
+        SqlCommand setCompletedCmd = new SqlCommand("UPDATE tasks SET completed = 'TRUE' WHERE id = @id;", conn);
+        setCompletedCmd.Parameters.AddWithValue("@id", _id);
+        setCompletedCmd.ExecuteNonQuery();
+        _completed = true;
+      }
+      if (conn != null) conn.Close();
+    }
+
     public static List<Task> GetAll()
     {
       List<Task> allTasks = new List<Task>{};
@@ -115,7 +158,8 @@ namespace ToDoList.Objects
       {
         int taskId = rdr.GetInt32(0);
         string taskDescription = rdr.GetString(1);
-        Task newTask = new Task(taskDescription, taskId);
+        bool completed = rdr.GetBoolean(2);
+        Task newTask = new Task(taskDescription, completed, taskId);
         allTasks.Add(newTask);
       }
 
@@ -134,9 +178,10 @@ namespace ToDoList.Objects
 		{
 			SqlConnection conn = DB.Connection();
 			conn.Open();
-			SqlCommand cmd = new SqlCommand("INSERT INTO tasks (description) OUTPUT INSERTED.id VALUES (@TaskDescription);", conn);
+			SqlCommand cmd = new SqlCommand("INSERT INTO tasks (description, completed) OUTPUT INSERTED.id VALUES (@TaskDescription, @Completed);", conn);
 
 			cmd.Parameters.AddWithValue("@TaskDescription", _description);
+      cmd.Parameters.AddWithValue("@Completed", _completed);
 			SqlDataReader rdr = cmd.ExecuteReader();
 
 			while(rdr.Read())
@@ -161,13 +206,14 @@ namespace ToDoList.Objects
 
 			int foundTaskId = 0;
 			string foundTaskDescription = null;
-
+      bool foundTaskCompleted = false;
 			while(rdr.Read())
 			{
 				foundTaskId = rdr.GetInt32(0);
 				foundTaskDescription = rdr.GetString(1);
+        foundTaskCompleted = rdr.GetBoolean(2);
 			}
-			Task foundTask = new Task(foundTaskDescription, foundTaskId);
+			Task foundTask = new Task(foundTaskDescription, foundTaskCompleted, foundTaskId);
 
 			if (rdr != null)
 			{
@@ -186,13 +232,10 @@ namespace ToDoList.Objects
 			SqlConnection conn = DB.Connection();
 			conn.Open();
 
-			SqlCommand cmd = new SqlCommand("DELETE FROM tasks WHERE id = @TaskId;", conn);
-			SqlParameter taskIdParameter = new SqlParameter();
-			taskIdParameter.ParameterName = "@TaskId";
-			taskIdParameter.Value = id.ToString();
-			cmd.Parameters.Add(taskIdParameter);
+			SqlCommand cmd = new SqlCommand("DELETE FROM tasks WHERE id = @TaskId; DELETE FROM categories_tasks WHERE task_id = @TaskId;", conn);
+			cmd.Parameters.AddWithValue("@TaskId", id.ToString());
 			SqlDataReader rdr = cmd.ExecuteReader();
-			conn.Close();
+			if (conn != null) conn.Close();
 		}
 
 		public static void DeleteAll()

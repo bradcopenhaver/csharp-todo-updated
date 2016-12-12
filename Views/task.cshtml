@@ -2,46 +2,54 @@
   Layout="Shared/_Layout.cshtml";
 }
 
-@if (@Model.Count == 0)
+<h2>Here are all the categories for this task:</h2>
+
+@if (@Model["categories"].Count == 0)
 {
-  <p>No tasks have been added yet!</p>
+  <p>No categories have been added yet!</p>
 }
 else
 {
   int count = 0;
   string rowHighlight = "row";
-  <h1>Here is your list of tasks:</h1>
-  <ul>
-    @foreach (var task in Model)
+  <ol>
+    @foreach (var category in @Model["categories"])
     {
       if (count % 2 == 0)
       {
-        count++;
         rowHighlight = rowHighlight + " dark";
+        count++;
       }
       else
       {
-        count++;
         rowHighlight = rowHighlight + " light";
+        count++;
       }
       <div class="@rowHighlight">
         <li>
           <div class="col-md-4">
-            @task.GetDescription()&nbsp;
+            @category.GetName()&nbsp;
           </div>
+
           <div class="col-md-4">
-            @task.GetDueDate().Date.ToString("MM/dd/yyyy")
-          </div>
-          <div class="col-md-4">
-            <a class="btn btn-danger" href="/tasks/delete/@task.GetId()">X</a>
+            <a class="btn btn-danger" href="/categories/delete/@category.GetId()">X</a>
           </div>
         </li>
       </div>
     }
-  </ul>
-  <form action="/tasks/delete" method="post">
-    <button class="btn btn-danger" type="submit">Clear all tasks</button>
-  </form>
+  </ol>
 }
-<p><a class="btn btn-primary" href="/tasks/new">Add a new task</a></p>
-<p><a class="btn btn-default" href="/">Return home</a></p>
+<h4>Add a category to this task:</h4>
+<form action='/task/add_category' method='post'>
+  <input id='task-id' name='task-id' type='hidden' value='@Model["task"].GetId()'>
+  <label for='category-id'>Select a category</label>
+  <select id='category-id' name='category-id' type='text'>
+    @foreach (var category in @Model["allCategories"])
+    {
+      <option value='@category.GetId()'>@category.GetName()</option>
+    }
+  </select>
+  <button type='submit'>Add</button>
+</form>
+<p><a class="btn btn-primary" href="/categories/new">Add a new category</a></p>
+<p><a class="btn btn-default" href="/">Return to Main Page</a></p>

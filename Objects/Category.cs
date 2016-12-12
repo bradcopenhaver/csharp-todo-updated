@@ -78,19 +78,12 @@ namespace ToDoList.Objects
       SqlConnection conn = DB.Connection();
       conn.Open();
 
-      SqlCommand cmd = new SqlCommand("DELETE FROM categories WHERE id = @CategoryId;", conn);
+      SqlCommand cmd = new SqlCommand("DELETE FROM categories WHERE id = @CategoryId; DELETE FROM categories_tasks WHERE category_id = @CategoryId;", conn);
 
-      SqlParameter categoryIdParameter = new SqlParameter();
-      categoryIdParameter.ParameterName = "@CategoryId";
-      categoryIdParameter.Value = this.GetId();
-
-      cmd.Parameters.Add(categoryIdParameter);
+      cmd.Parameters.AddWithValue("@CategoryId", _id.ToString());
       cmd.ExecuteNonQuery();
 
-      if (conn != null)
-      {
-        conn.Close();
-      }
+      if (conn != null) conn.Close();
     }
 
     public static Category Find(int id)
@@ -190,7 +183,8 @@ namespace ToDoList.Objects
         {
           int thisTaskId = queryReader.GetInt32(0);
           string taskDescription = queryReader.GetString(1);
-          Task foundTask = new Task(taskDescription, thisTaskId);
+          bool thisTaskCompleted = queryReader.GetBoolean(2);
+          Task foundTask = new Task(taskDescription, thisTaskCompleted, thisTaskId);
           tasks.Add(foundTask);
         }
         if (queryReader != null) {queryReader.Close();}
